@@ -1,4 +1,4 @@
-# Décomposition des tâches
+## Décomposition des tâches (voir fichier mc-tp-note.kxml)
 
 | Niveau | Tâche | Opérateur | Type d'Exécutant | Rôle de la Tâche |
 |-------|-------|-----------|------------------|------------------|
@@ -19,3 +19,24 @@
 | N:3.3 | SupprimerUneTâche | Alternatif | Abstrait | Procédure pour supprimer un élément. |
 | N:3.3.1 | SupprimerViaX | N/A | Interaction | Suppression via le bouton **"X"** (icône au survol). |
 | N:3.3.2 | SaisirTexteVide | N/A | Interaction | Suppression par édition et vidage du texte. |
+
+## Objectif
+Ce projet contient une suite de tests end‑to‑end (E2E) pour l’application TodoMVC Angular. Les tests vérifient le bon fonctionnement des différentes étapes du projet :
+Étape 1 : gestion des tâches via l’interface principale.
+Étape 2 : synchronisation des tâches entre deux blocs et mise à jour du JSON.
+Étape bonus : fonctionnalités Annuler / Refaire (Undo/Redo).
+
+## Structure du projet
+`selectors.ts` → Définit les sélecteurs CSS pour accéder aux éléments de l’interface (Étape 1 et Étape 2).
+`actions.ts` → Contient les actions réutilisables (ajouter, supprimer, cocher, éditer).
+`scenarios.ts` → Regroupe les scénarios de test (séquences d’actions + vérifications).
+`test.spec.ts` → Fichier principal qui organise les tests en blocs logiques (test.describe) selon le modèle de tâches.
+
+
+## Organisation des tests
+Les tests sont regroupés par niveau de tâche (modèle hiérarchique) :
+N:1 AjouterTâche → saisie et validation d’une nouvelle tâche.
+N:2 GérerLesTâches → filtrer, cocher/décocher, supprimer.
+N:3 ModifierUneTâche → éditer ou supprimer via bouton X.
+Étape 2 (Synchronisation) → vérifier que les actions dans un bloc apparaissent dans l’autre et dans le JSON.
+Étape bonus (Annuler/Refaire) → tester les boutons et les raccourcis clavier (CTRL+Z / CTRL+Y).
