@@ -40,7 +40,7 @@ export async function scenarioMarquerTermineEtFiltrer(page: Page, url: string): 
   await Actions.ajouterItem('Tâche 1')(page);
   await Actions.ajouterItem('Tâche 2')(page);
 
-  await Actions.marquerCommeTermine('Tâche 1')(page);
+  await Actions.cocherCase('Tâche 1')(page);
 
   await Actions.afficherFiltreActifs()(page);
   const activeOnly = await Verifications.listeContient(['Tâche 2'])(page);
@@ -60,7 +60,7 @@ export async function scenarioAjouterEtMarquerUneTerminee(page: Page, url: strin
   const hasItems = await Verifications.listeContient(['Tâche A', 'Tâche B'])(page);
   expect(hasItems).toBe(true);
 
-  await Actions.marquerCommeTermine('Tâche A')(page);
+  await Actions.cocherCase('Tâche A')(page);
 
   // Проверить, что обе задачи остаются в списке (одна завершена, одна активна)
   const bothPresent = await Verifications.listeContient(['Tâche A', 'Tâche B'])(page);
@@ -120,8 +120,8 @@ export async function scenarioSupprimerTachesCochees(page: Page, url: string): A
   expect(allPresent).toBe(true);
 
   // отметить A и C как завершённые
-  await Actions.marquerCommeTermine('Tâche A')(page);
-  await Actions.marquerCommeTermine('Tâche C')(page);
+  await Actions.cocherCase('Tâche A')(page);
+  await Actions.cocherCase('Tâche C')(page);
 
   // небольшая пауза, чтобы состояние применилось
   await new Promise(r => setTimeout(r, 200));
@@ -193,5 +193,43 @@ export async function scenarioAjouterSynchronise(page: Page, url: string): Actio
   const jsonText = await page.locator('h2:text("Étape 1") + pre').innerText();
   expect(jsonText).toContain('"label": "Tâche synchro"');
 }
+
+
+// Étape 2 : Supprimer une tâche → JSON mis à jour
+export async function scenarioSupprimerSynchronise(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  await Actions.ajouterItem('À supprimer')(page);
+  await Actions.supprimerItem('À supprimer')(page);
+
+  const jsonText = await page.locator('h2:text("Étape 1") + pre').innerText();
+  expect(jsonText).not.toContain('"label": "À supprimer"');
+}
+
+// Étape 2 : Cocher une tâche → JSON mis à jour
+export async function scenarioCocherSynchronise(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  await Actions.ajouterItem('À cocher')(page);
+  await Actions.cocherCase('À cocher')(page);
+
+  const jsonText = await page.locator('h2:text("Étape 1") + pre').innerText();
+  expect(jsonText).toContain('"label": "À cocher"');
+  expect(jsonText).toContain('"done": true');
+}
+
+// Étape 2 : Décocher une tâche → JSON mis à jour
+export async function scenarioDecocherSynchronise(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  await Actions.ajouterItem('À décocher')(page);
+  await Actions.cocherCase('À décocher')(page);
+  await Actions.cocherCase('À décocher')(page);
+
+  const jsonText = await page.locator('h2:text("Étape 1") + pre').innerText();
+  expect(jsonText).toContain('"label": "À décocher"');
+  expect(jsonText).toContain('"done": false');
+}
+
 
 

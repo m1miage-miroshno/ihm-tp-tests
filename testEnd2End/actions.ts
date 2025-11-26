@@ -117,7 +117,7 @@ export const Actions = {
       await item.locator(SELECTORS.destroyButton).click();
     },
 
-  marquerCommeTermine: (label: string): PageAction =>
+  cocherCase: (label: string): PageAction =>
     async (page) => {
       const item = page.locator(SELECTORS.todoList).filter({ hasText: label });
       await item.locator(SELECTORS.toggleButton).click();
