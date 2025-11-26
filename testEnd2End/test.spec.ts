@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { scenarioAjouterEtSupprimer, scenarioMarquerTermineEtFiltrer, scenarioAjouterEtMarquerUneTerminee, scenarioAjouterEtEditer, scenarioSupprimerViaBoutonX, scenarioToggleAll, scenarioAjouterSynchronise, scenarioSupprimerSynchronise, scenarioCocherSynchronise, scenarioDecocherSynchronise } from './scenarios';
+import { scenarioAjouterEtSupprimer, scenarioMarquerTermineEtFiltrer, scenarioAjouterEtMarquerUneTerminee, scenarioAjouterEtEditer, scenarioSupprimerViaBoutonX, scenarioToggleAll, scenarioAjouterSynchronise, scenarioSupprimerSynchronise, scenarioCocherSynchronise, scenarioDecocherSynchronise, scenarioAnnulerRefaireBoutons, scenarioModifierSynchronise } from './scenarios';
 import { GestionDesItems } from './GestionDesItems';
 import { Actions } from './actions';
 import { SELECTORS } from './selectors';
@@ -41,20 +41,29 @@ test.describe('E2E TodoMVC Tests', () => {
 });
 
 test.describe('E2E TodoMVC Étape 2 (synchronisation)', () => {
-  test('Ajouter une tâche et vérifier synchro', async ({ page }) => {
+  test('Ajouter une tâche → JSON mis à jour', async ({ page }) => {
     await scenarioAjouterSynchronise(page, URL);
   });
 
-  test('Supprimer une tâche et vérifier synchro', async ({ page }) => {
+  test('Supprimer une tâche → JSON mis à jour', async ({ page }) => {
     await scenarioSupprimerSynchronise(page, URL);
   });
 
-  test('Cocher une tâche et vérifier synchro', async ({ page }) => {
+  test('Cocher une tâche → JSON mis à jour', async ({ page }) => {
     await scenarioCocherSynchronise(page, URL);
   });
 
-  test('Décocher une tâche et vérifier synchro', async ({ page }) => {
+  test('Décocher une tâche → JSON mis à jour', async ({ page }) => {
     await scenarioDecocherSynchronise(page, URL);
   });
-});
 
+  test('Modifier une tâche → JSON mis à jour', async ({ page }) => {
+    await scenarioModifierSynchronise(page, URL);
+  });
+
+  test('Annuler/Refaire avec boutons → JSON mis à jour', async ({ page }) => {
+    await scenarioAnnulerRefaireBoutons(page, URL);
+  });
+
+
+});

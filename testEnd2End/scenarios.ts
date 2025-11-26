@@ -231,5 +231,34 @@ export async function scenarioDecocherSynchronise(page: Page, url: string): Acti
   expect(jsonText).toContain('"done": false');
 }
 
+// Étape bonus : Annuler/Refaire via boutons
+export async function scenarioAnnulerRefaireBoutons(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  await Actions.ajouterItem('Tâche annulable')(page);
+
+  // Annuler
+  await page.click('button:has-text("Annuler")');
+  let existe = await Verifications.itemExiste('Tâche annulable')(page);
+  expect(existe).toBe(false);
+
+  // Refaire
+  await page.click('button:has-text("Refaire")');
+  existe = await Verifications.itemExiste('Tâche annulable')(page);
+  expect(existe).toBe(true);
+}
+
+// Modifier une tâche → JSON mis à jour
+export async function scenarioModifierSynchronise(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  await Actions.ajouterItem('Ancien nom')(page);
+  await Actions.editerItem('Ancien nom', 'Nouveau nom')(page);
+
+  const jsonText = await page.locator('h2:text("Étape 1") + pre').innerText();
+  expect(jsonText).toContain('"label": "Nouveau nom"');
+  expect(jsonText).not.toContain('"label": "Ancien nom"');
+}
+
 
 
