@@ -5,11 +5,11 @@ export type ActionResult<T> = Promise<T>;
 export type PageAction<T = void> = (page: Page) => ActionResult<T>;
 
 
-// helper: попытаться кликнуть по первым доступным селекторам
+// helper: tenter de cliquer sur les premiers sélecteurs disponibles
 async function clickWithFallback(page: Page, selectors: string[], timeout = 3000) {
   const tried: string[] = [];
 
-  // Диагностика: проверить, видны ли фильтры вообще
+  // Diagnostic : vérifier si les filtres sont visibles
   let filtersVisible = false;
   try {
     const filterContainers = ['ul.filters', 'footer .filters', '.filters', '[class*="filter"]'];
@@ -19,11 +19,11 @@ async function clickWithFallback(page: Page, selectors: string[], timeout = 3000
         filtersVisible = true;
         break;
       } catch {
-        // пробуем следующий
+        // essayer le conteneur suivant
       }
     }
   } catch {
-    // игнорируем
+    // ignorer les erreurs de diagnostic
   }
 
   for (const sel of selectors.filter(Boolean)) {
@@ -34,7 +34,7 @@ async function clickWithFallback(page: Page, selectors: string[], timeout = 3000
       await loc.click();
       return;
     } catch {
-      // пробуем следующий селектор
+      // essayer le sélecteur suivant
     }
   }
 
@@ -52,7 +52,7 @@ export const Actions = {
         await page.goto(url, { waitUntil: 'load', timeout: 30000 });
       } catch (e: any) {
         const msg = String(e?.message ?? e);
-        // Если ошибка связана с TLS/сертификатом — попытаться перейти по http как fallback
+        // Si l'erreur est liée au TLS/certificat — essayer d'accéder en http comme solution de secours
         if (
           msg.includes('TLS') ||
           msg.includes('secure connection') ||
@@ -64,7 +64,7 @@ export const Actions = {
             await page.goto(fallbackUrl, { waitUntil: 'load', timeout: 30000 });
             return;
           } catch {
-            // если fallback тоже упал — пробросим первоначальную ошибку дальше
+            // si le fallback échoue aussi — laisser l'erreur se propager
           }
         }
         throw e;
@@ -73,7 +73,7 @@ export const Actions = {
 
   ajouterItem: (label: string): PageAction =>
     async (page) => {
-      // Попытаться найти поле ввода по нескольким селекторам (SELECTORS.newTodoInput + распространённые варианты)
+      // Tenter de trouver le champ d'entrée via plusieurs sélecteurs (SELECTORS.newTodoInput + variantes courantes)
       const possibleSelectors = [
         SELECTORS.newTodoInput,
         'input#new-todo',
@@ -86,12 +86,12 @@ export const Actions = {
       for (const sel of possibleSelectors) {
         try {
           const loc = page.locator(sel).first();
-          // Небольшой таймаут ожидания видимости (3s) — если не найдено, пробуем следующий селектор
+          // Petit timeout d'attente de visibilité (3s) — si non trouvé, essayer le sélecteur suivant
           await loc.waitFor({ state: 'visible', timeout: 3000 });
           inputLocator = loc;
           break;
         } catch (e) {
-          // продолжить на следующий селектор
+          // continuer avec le sélecteur suivant
         }
       }
 
@@ -123,7 +123,7 @@ export const Actions = {
       await item.locator(SELECTORS.toggleButton).click();
     },
 
-  // добавлено: удалить отмеченные задачи
+  // ajouté : supprimer les tâches cochées
   supprimerTachesCochees: (): PageAction =>
     async (page) => {
       await clickWithFallback(page, [
@@ -134,36 +134,36 @@ export const Actions = {
       ]);
     },
 
-  // Добавлено: редактирование задачи (double-click по label -> заполнить input.edit -> Enter/blur).
-  // Если newText === '' — пытаемся дождаться удаления элемента; если не удалился — используем supprimerItem.
+  // Ajouté : édition d'une tâche (double-clic sur label -> remplir input.edit -> Enter/blur).
+  // Si newText === '' — tenter d'attendre la suppression de l'élément ; si pas supprimé — utiliser supprimerItem.
   editerItem: (oldText: string, newText: string): PageAction =>
     async (page) => {
       const item = page.locator(SELECTORS.todoList).filter({ hasText: oldText }).first();
       const label = item.locator('label').first();
       await label.dblclick();
       const editInput = item.locator('input.edit').first();
-      // дождаться видимости поля редактирования (если не появилось — возможно другой селектор, тогда упадёт)
+      // attendre la visibilité du champ d'édition (si non apparu — autre sélecteur peut être nécessaire)
       await editInput.waitFor({ state: 'visible', timeout: 3000 });
       await editInput.fill(newText);
-      // подтвердить изменение
+      // valider la modification
       await editInput.press('Enter');
-      // если очистили текст — подождать, что элемент исчезнет; иначе при необходимости удалить вручную
+      // si on a vidé le texte — attendre la disparition de l'élément ; sinon supprimer manuellement si nécessaire
       if (newText === '') {
-        // дать время на обработку
+        // laisser le temps au traitement
         await page.waitForTimeout(300);
         const remaining = await page.locator(SELECTORS.todoList).filter({ hasText: oldText }).count();
         if (remaining > 0) {
-          // попробовать убрать фокус и подождать
+          // tenter de retirer le focus et attendre
           await editInput.evaluate((el: any) => el.blur && el.blur());
           await page.waitForTimeout(200);
           const still = await page.locator(SELECTORS.todoList).filter({ hasText: oldText }).count();
           if (still > 0) {
-            // крайний вариант — удалить явно
+            // option extrême — supprimer explicitement
             await Actions.supprimerItem(oldText)(page);
           }
         }
       } else {
-        // ждать, что редактирование применилось (инпут скроется)
+        // attendre que l'édition soit appliquée (le champ d'édition se cache)
         await editInput.waitFor({ state: 'hidden', timeout: 2000 }).catch(() => {});
       }
     },
@@ -197,7 +197,7 @@ export const Actions = {
       ]);
     },
 
-  // добавлено: переключить все задачи (Toggle All)
+  // ajouté : basculer toutes les tâches (Toggle All)
   toggleAll: (): PageAction =>
     async (page) => {
       await clickWithFallback(page, [

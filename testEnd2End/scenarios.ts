@@ -22,11 +22,11 @@ export async function scenarioAjouterEtSupprimer(page: Page, url: string): Actio
   expect(remaining).toBe(true);
 }
 
-// passe pas
+// ne passe pas
 export async function scenarioAjouterTacheVide(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
-  // ajouter tache vide
+  // ajouter tâche vide
   await Actions.ajouterItem('')(page);
 
   // la liste doit rester vide
@@ -62,26 +62,26 @@ export async function scenarioAjouterEtMarquerUneTerminee(page: Page, url: strin
 
   await Actions.cocherCase('Tâche A')(page);
 
-  // Проверить, что обе задачи остаются в списке (одна завершена, одна активна)
+  // Vérifier que les deux tâches restent dans la liste (une complétée, une active)
   const bothPresent = await Verifications.listeContient(['Tâche A', 'Tâche B'])(page);
   expect(bothPresent).toBe(true);
 }
 
-// Добавлено: сценарий — добавить задачу и отредактировать её
+// Ajouté : scénario — ajouter une tâche et l'éditer
 export async function scenarioAjouterEtEditer(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
-  // добавить задачу с исходным текстом
+  // ajouter la tâche avec le texte initial
   await Actions.ajouterItem('Ancienne tâche')(page);
 
-  // убедиться, что она добавлена
+  // s'assurer qu'elle est ajoutée
   const exists = await Verifications.itemExiste('Ancienne tâche')(page);
   expect(exists).toBe(true);
 
-  // отредактировать на новый текст
+  // éditer vers le nouveau texte
   await Actions.editerItem('Ancienne tâche', 'Nouvelle tâche')(page);
 
-  // проверить, что старого текста нет и новый присутствует
+  // vérifier que l'ancien texte a disparu et que le nouveau est présent
   const oldGone = await Verifications.itemNExistePas('Ancienne tâche')(page);
   expect(oldGone).toBe(true);
 
@@ -89,7 +89,7 @@ export async function scenarioAjouterEtEditer(page: Page, url: string): ActionRe
   expect(newExists).toBe(true);
 }
 
-// Добавлено: сценарий — добавить задачу, отредактировать, очистить и проверить исчезновение
+// Ajouté : scénario — ajouter une tâche, éditer pour vider et vérifier la disparition
 export async function scenarioEditerEtSupprimerSiVide(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -99,15 +99,15 @@ export async function scenarioEditerEtSupprimerSiVide(page: Page, url: string): 
   const exists = await Verifications.itemExiste(original)(page);
   expect(exists).toBe(true);
 
-  // Отредактировать в пустую строку
+  // Éditer en chaîne vide
   await Actions.editerItem(original, '')(page);
 
-  // Проверить, что задача исчезла
+  // Vérifier que la tâche a disparu
   const gone = await Verifications.itemNExistePas(original)(page);
   expect(gone).toBe(true);
 }
 
-// Добавлено: добавить A,B,C; отметить A и C; нажать "Supprimer cochées"; проверить результат
+// Ajouté : ajouter A,B,C; marquer A et C; cliquer sur "Supprimer cochées"; vérifier le résultat
 export async function scenarioSupprimerTachesCochees(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -115,21 +115,21 @@ export async function scenarioSupprimerTachesCochees(page: Page, url: string): A
   await Actions.ajouterItem('Tâche B')(page);
   await Actions.ajouterItem('Tâche C')(page);
 
-  // убедиться, что все добавлены
+  // s'assurer que toutes sont ajoutées
   const allPresent = await Verifications.listeContient(['Tâche A', 'Tâche B', 'Tâche C'])(page);
   expect(allPresent).toBe(true);
 
-  // отметить A и C как завершённые
+  // marquer A et C comme complétées
   await Actions.cocherCase('Tâche A')(page);
   await Actions.cocherCase('Tâche C')(page);
 
-  // небольшая пауза, чтобы состояние применилось
+  // petite pause pour que l'état soit appliqué
   await new Promise(r => setTimeout(r, 200));
 
-  // удалить отмеченные задачи
+  // supprimer les tâches cochées
   await Actions.supprimerTachesCochees()(page);
 
-  // проверить, что A и C исчезли, а B остался
+  // vérifier que A et C ont disparu, et que B est toujours présente
   const aGone = await Verifications.itemNExistePas('Tâche A')(page);
   const cGone = await Verifications.itemNExistePas('Tâche C')(page);
   const bExists = await Verifications.itemExiste('Tâche B')(page);
@@ -139,21 +139,21 @@ export async function scenarioSupprimerTachesCochees(page: Page, url: string): A
   expect(bExists).toBe(true);
 }
 
-// Добавлено: сценарий — Toggle All вкл/выкл и проверки
+// Ajouté : scénario — Toggle All on/off et vérifications
 export async function scenarioToggleAll(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
   await Actions.ajouterItem('Tâche 1')(page);
   await Actions.ajouterItem('Tâche 2')(page);
 
-  // нажать Toggle All — ожидать, что обе отмечены
+  // cliquer sur Toggle All — attendre que les deux soient cochées
   await Actions.toggleAll()(page);
   const t1Done = await Verifications.itemEstTermine('Tâche 1')(page);
   const t2Done = await Verifications.itemEstTermine('Tâche 2')(page);
   expect(t1Done).toBe(true);
   expect(t2Done).toBe(true);
 
-  // нажать Toggle All снова — ожидать, что обе стали активными
+  // cliquer de nouveau — attendre que les deux redeviennent actives
   await Actions.toggleAll()(page);
   const t1Active = await Verifications.itemEstActif('Tâche 1')(page);
   const t2Active = await Verifications.itemEstActif('Tâche 2')(page);
@@ -161,21 +161,21 @@ export async function scenarioToggleAll(page: Page, url: string): ActionResult<v
   expect(t2Active).toBe(true);
 }
 
-// Добавлено: сценарий — удалить задачу через кнопку "X" (destroy)
+// Ajouté : scénario — supprimer une tâche via le bouton "X" (destroy)
 export async function scenarioSupprimerViaBoutonX(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
   const label = 'Tâche à supprimer';
   await Actions.ajouterItem(label)(page);
 
-  // убедиться, что задача добавлена
+  // vérifier que la tâche est ajoutée
   const exists = await Verifications.itemExiste(label)(page);
   expect(exists).toBe(true);
 
-  // удалить через кнопку "X" (destroy) — Actions.supprimerItem делает hover + click по destroy
+  // supprimer via le bouton "X" — Actions.supprimerItem effectue hover + click sur destroy
   await Actions.supprimerItem(label)(page);
 
-  // проверить, что задача исчезла
+  // vérifier que la tâche a disparu
   const gone = await Verifications.itemNExistePas(label)(page);
   expect(gone).toBe(true);
 }

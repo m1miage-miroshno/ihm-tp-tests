@@ -8,7 +8,7 @@ const URL = 'https://alexdmr.github.io/l3m-2023-2024-angular-todolist/';
 
 test.describe('E2E TodoMVC Tests', () => {
   test('Scénario: Ajouter et supprimer des items', async ({ page }) => {
-    await scenarioAjouterEtSupprimer(page, URL); // передаём URL
+    await scenarioAjouterEtSupprimer(page, URL); // transmettre l'URL
   });
 
   // dans le bon fonctionnement, ce test doit passer 
