@@ -22,6 +22,18 @@ export async function scenarioAjouterEtSupprimer(page: Page, url: string): Actio
   expect(remaining).toBe(true);
 }
 
+// passe pas
+export async function scenarioAjouterTacheVide(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  // ajouter tache vide
+  await Actions.ajouterItem('')(page);
+
+  // la liste doit rester vide
+  const estVide = await Verifications.listeEstVide()(page);
+  expect(estVide).toBe(true);
+}
+
 export async function scenarioMarquerTermineEtFiltrer(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 

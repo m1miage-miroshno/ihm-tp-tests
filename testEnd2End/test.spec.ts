@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { scenarioAjouterEtSupprimer, scenarioMarquerTermineEtFiltrer, scenarioAjouterEtMarquerUneTerminee, scenarioAjouterEtEditer, scenarioEditerEtSupprimerSiVide, scenarioSupprimerTachesCochees, scenarioToggleAll } from './scenarios';
+import { scenarioAjouterEtSupprimer, scenarioMarquerTermineEtFiltrer, scenarioAjouterEtMarquerUneTerminee, scenarioAjouterEtEditer, scenarioEditerEtSupprimerSiVide, scenarioSupprimerTachesCochees, scenarioToggleAll, scenarioAjouterTacheVide } from './scenarios';
 import { GestionDesItems } from './GestionDesItems';
 import { Actions } from './actions';
 import { SELECTORS } from './selectors';
@@ -10,6 +10,11 @@ test.describe('E2E TodoMVC Tests', () => {
   test('Scénario: Ajouter et supprimer des items', async ({ page }) => {
     await scenarioAjouterEtSupprimer(page, URL); // передаём URL
   });
+
+  // dans le bon fonctionnement, ce test doit passer 
+//   test('Scénario: Ajouter une tâche vide', async ({ page }) => {
+//   await scenarioAjouterTacheVide(page, URL);
+// });
 
   test('Scénario: Marquer comme terminé et filtrer', async ({ page }) => {
     await scenarioMarquerTermineEtFiltrer(page, URL); 
