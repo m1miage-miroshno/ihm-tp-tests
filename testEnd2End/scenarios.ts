@@ -4,6 +4,8 @@ import { Verifications } from './verifications';
 import { ActionResult } from './actions';
 
 
+// N:1 (AjouterTâche) -> N:1.1 (SaisirTexte), N:1.2 (CliquerEnter)
+// N:3.3.1 (SupprimerViaX) — scénario qui ajoute des tâches puis supprime une via le bouton X
 export async function scenarioAjouterEtSupprimer(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -22,7 +24,8 @@ export async function scenarioAjouterEtSupprimer(page: Page, url: string): Actio
   expect(remaining).toBe(true);
 }
 
-// ne passe pas
+// N:1 (AjouterTâche) -> N:1.1 (SaisirTexte vide), N:1.2 (CliquerEnter)
+// test du comportement lorsqu'on tente d'ajouter une tâche sans texte
 export async function scenarioAjouterTacheVide(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -34,6 +37,9 @@ export async function scenarioAjouterTacheVide(page: Page, url: string): ActionR
   expect(estVide).toBe(true);
 }
 
+// N:2 (GérerLesTâches) -> N:2.2 (CocherOuDecocher), N:2.1 (FiltrerLaListe)
+// N:2.1.2 (AfficherTâchesActives), N:2.1.3 (AfficherTâchesComplétées)
+// scénario qui coche une tâche puis vérifie les filtres actifs/complétés
 export async function scenarioMarquerTermineEtFiltrer(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -51,6 +57,8 @@ export async function scenarioMarquerTermineEtFiltrer(page: Page, url: string): 
   expect(completedOnly).toBe(true);
 }
 
+// N:1 (AjouterTâche) + N:2.2 (CocherOuDecocher)
+// ajouter deux tâches et marquer l'une d'elles comme terminée (vérification du statu)
 export async function scenarioAjouterEtMarquerUneTerminee(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -67,7 +75,8 @@ export async function scenarioAjouterEtMarquerUneTerminee(page: Page, url: strin
   expect(bothPresent).toBe(true);
 }
 
-// Ajouté : scénario — ajouter une tâche et l'éditer
+// N:1 (AjouterTâche) + N:3 (ModifierUneTâche) -> N:3.2 (ModifierNomTache)
+// scénario qui ajoute une tâche puis édite son texte
 export async function scenarioAjouterEtEditer(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -89,7 +98,8 @@ export async function scenarioAjouterEtEditer(page: Page, url: string): ActionRe
   expect(newExists).toBe(true);
 }
 
-// Ajouté : scénario — ajouter une tâche, éditer pour vider et vérifier la disparition
+// N:1 (AjouterTâche) + N:3.2 (ModifierNomTache) -> N:3.3.2 (SaisirTexteVide)
+// scénario qui édite une tâche pour vider le texte et vérifier sa suppression
 export async function scenarioEditerEtSupprimerSiVide(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -107,7 +117,8 @@ export async function scenarioEditerEtSupprimerSiVide(page: Page, url: string): 
   expect(gone).toBe(true);
 }
 
-// Ajouté : ajouter A,B,C; marquer A et C; cliquer sur "Supprimer cochées"; vérifier le résultat
+// N:2 (GérerLesTâches) -> N:2.2 (CocherOuDecocher) et N:2.3 (SupprimerCochéesViaV)
+// ajouter A,B,C, cocher A et C, puis supprimer les cochées
 export async function scenarioSupprimerTachesCochees(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -139,7 +150,8 @@ export async function scenarioSupprimerTachesCochees(page: Page, url: string): A
   expect(bExists).toBe(true);
 }
 
-// Ajouté : scénario — Toggle All on/off et vérifications
+// N:2.2 (CocherOuDecocher) — action de basculement global (Toggle All)
+// scénario Toggle All : cocher/décocher toutes les tâches
 export async function scenarioToggleAll(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -161,7 +173,8 @@ export async function scenarioToggleAll(page: Page, url: string): ActionResult<v
   expect(t2Active).toBe(true);
 }
 
-// Ajouté : scénario — supprimer une tâche via le bouton "X" (destroy)
+// N:3.3 (SupprimerUneTâche) -> N:3.3.1 (SupprimerViaX)
+// scénario qui supprime une tâche via le bouton "X" (destroy)
 export async function scenarioSupprimerViaBoutonX(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -180,9 +193,9 @@ export async function scenarioSupprimerViaBoutonX(page: Page, url: string): Acti
   expect(gone).toBe(true);
 }
 
-// ETAPE 2
-// Modèle de Tâches : N1 AjouterTâche (synchro Étape 1 → Étape 2 + JSON)
-// Vérifier la synchro Étape 1 → JSON Étape 2
+// ETAPE 2 — Synchronisation UI ↔ JSON
+// N:1 (AjouterTâche) et synchronisation visée avec l'ETAPE 2 (JSON)
+// vérifier que l'ajout est répercuté dans le JSON (pré)
 export async function scenarioAjouterSynchronise(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -195,7 +208,8 @@ export async function scenarioAjouterSynchronise(page: Page, url: string): Actio
 }
 
 
-// Étape 2 : Supprimer une tâche → JSON mis à jour
+// ETAPE 2 — suppression synchronisée
+// N:3.3 (SupprimerUneTâche) et synchronisation vers JSON
 export async function scenarioSupprimerSynchronise(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -206,7 +220,8 @@ export async function scenarioSupprimerSynchronise(page: Page, url: string): Act
   expect(jsonText).not.toContain('"label": "À supprimer"');
 }
 
-// Étape 2 : Cocher une tâche → JSON mis à jour
+// ETAPE 2 — cocher ↔ JSON
+// N:2.2 (CocherOuDecocher) avec vérification de la synchronisation JSON ("done": true)
 export async function scenarioCocherSynchronise(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -218,7 +233,8 @@ export async function scenarioCocherSynchronise(page: Page, url: string): Action
   expect(jsonText).toContain('"done": true');
 }
 
-// Étape 2 : Décocher une tâche → JSON mis à jour
+// ETAPE 2 — décocher ↔ JSON
+// N:2.2 (CocherOuDecocher) avec vérification de la synchronisation JSON ("done": false)
 export async function scenarioDecocherSynchronise(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -231,7 +247,8 @@ export async function scenarioDecocherSynchronise(page: Page, url: string): Acti
   expect(jsonText).toContain('"done": false');
 }
 
-// Étape bonus : Annuler/Refaire via boutons
+// Annuler/Refaire (boutons) — scénario bonus
+// Ce scénario couvre l'UX d'annulation/refaire via boutons (fonctionnalité bonus)
 export async function scenarioAnnulerRefaireBoutons(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -248,7 +265,8 @@ export async function scenarioAnnulerRefaireBoutons(page: Page, url: string): Ac
   expect(existe).toBe(true);
 }
 
-// Modifier une tâche → JSON mis à jour
+// N:3.2 (ModifierNomTache) -> synchronisation vers ETAPE 2 (JSON)
+// éditer une tâche et vérifier que le JSON est mis à jour
 export async function scenarioModifierSynchronise(page: Page, url: string): ActionResult<void> {
   await Actions.ouvrirPage(url)(page);
 
@@ -258,6 +276,24 @@ export async function scenarioModifierSynchronise(page: Page, url: string): Acti
   const jsonText = await page.locator('h2:text("Étape 1") + pre').innerText();
   expect(jsonText).toContain('"label": "Nouveau nom"');
   expect(jsonText).not.toContain('"label": "Ancien nom"');
+}
+
+// Bonus clavier Annuler/Refaire
+// Scénario pour tester Annuler/Refaire via clavier (CTRL/CMD+Z, CTRL+Y ou variantes) — comportement bonus
+export async function scenarioAnnulerRefaireClavier(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  await Actions.ajouterItem('Tâche annulable')(page);
+
+  // Annuler avec CTRL+Z (ou CMD+Z sur Mac)
+  await page.keyboard.press('Control+Z');
+  let existe = await Verifications.itemExiste('Tâche annulable')(page);
+  expect(existe).toBe(false);
+
+  // Refaire avec CTRL+Y (ou CMD+Y sur Mac)
+  await page.keyboard.press('Control+Y');
+  existe = await Verifications.itemExiste('Tâche annulable')(page);
+  expect(existe).toBe(true);
 }
 
 
