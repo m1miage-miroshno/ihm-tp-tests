@@ -1,8 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
 import { scenarioAjouterEtSupprimer, scenarioMarquerTermineEtFiltrer, scenarioAjouterEtMarquerUneTerminee, scenarioAjouterEtEditer, scenarioSupprimerViaBoutonX, scenarioToggleAll, scenarioAjouterSynchronise, scenarioSupprimerSynchronise, scenarioCocherSynchronise, scenarioDecocherSynchronise, scenarioAnnulerRefaireBoutons, scenarioModifierSynchronise } from './scenarios';
-import { GestionDesItems } from './GestionDesItems';
-import { Actions } from './actions';
-import { SELECTORS } from './selectors';
 
 const URL = 'https://alexdmr.github.io/l3m-2023-2024-angular-todolist/';
 /**
