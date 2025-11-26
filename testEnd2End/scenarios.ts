@@ -161,4 +161,37 @@ export async function scenarioToggleAll(page: Page, url: string): ActionResult<v
   expect(t2Active).toBe(true);
 }
 
+// Добавлено: сценарий — удалить задачу через кнопку "X" (destroy)
+export async function scenarioSupprimerViaBoutonX(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  const label = 'Tâche à supprimer';
+  await Actions.ajouterItem(label)(page);
+
+  // убедиться, что задача добавлена
+  const exists = await Verifications.itemExiste(label)(page);
+  expect(exists).toBe(true);
+
+  // удалить через кнопку "X" (destroy) — Actions.supprimerItem делает hover + click по destroy
+  await Actions.supprimerItem(label)(page);
+
+  // проверить, что задача исчезла
+  const gone = await Verifications.itemNExistePas(label)(page);
+  expect(gone).toBe(true);
+}
+
+// ETAPE 2
+// Modèle de Tâches : N1 AjouterTâche (synchro Étape 1 → Étape 2 + JSON)
+// Vérifier la synchro Étape 1 → JSON Étape 2
+export async function scenarioAjouterSynchronise(page: Page, url: string): ActionResult<void> {
+  await Actions.ouvrirPage(url)(page);
+
+  // Ajouter une tâche dans Étape 1
+  await Actions.ajouterItem('Tâche synchro')(page);
+
+  // Vérifier que le JSON (dans <pre>) contient la tâche
+  const jsonText = await page.locator('h2:text("Étape 1") + pre').innerText();
+  expect(jsonText).toContain('"label": "Tâche synchro"');
+}
+
 

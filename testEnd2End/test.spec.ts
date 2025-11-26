@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { scenarioAjouterEtSupprimer, scenarioMarquerTermineEtFiltrer, scenarioAjouterEtMarquerUneTerminee, scenarioAjouterEtEditer, scenarioEditerEtSupprimerSiVide, scenarioSupprimerTachesCochees, scenarioToggleAll, scenarioAjouterTacheVide } from './scenarios';
+import { scenarioAjouterEtSupprimer, scenarioMarquerTermineEtFiltrer, scenarioAjouterEtMarquerUneTerminee, scenarioAjouterEtEditer, scenarioSupprimerViaBoutonX, scenarioToggleAll, scenarioAjouterSynchronise } from './scenarios';
 import { GestionDesItems } from './GestionDesItems';
 import { Actions } from './actions';
 import { SELECTORS } from './selectors';
@@ -28,16 +28,20 @@ test.describe('E2E TodoMVC Tests', () => {
     await scenarioAjouterEtEditer(page, URL);
   });
 
-  test('Scénario: Éditer une tâche en vide et vérifier suppression', async ({ page }) => {
-    await scenarioEditerEtSupprimerSiVide(page, URL);
-  });
-
-  test('Scénario: Supprimer les tâches cochées (A et C) et vérifier B reste', async ({ page }) => {
-    await scenarioSupprimerTachesCochees(page, URL);
+  test('Scénario: Supprimer via bouton "X"', async ({ page }) => {
+    await scenarioSupprimerViaBoutonX(page, URL);
   });
 
   test('Scénario: Toggle All — cocher/décocher toutes les tâches', async ({ page }) => {
     await scenarioToggleAll(page, URL);
   });
+
+  // ETAPE 2
+  test.describe('E2E TodoMVC Étape 2 (synchronisation)', () => {
+  test('Ajouter une tâche et vérifier synchro', async ({ page }) => {
+    await scenarioAjouterSynchronise(page, URL);
+  });
+});
+
 
 });
